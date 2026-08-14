@@ -1,0 +1,4 @@
+﻿Solucao,Jornada_Pareto_ID,Distancia_km,Risco_acumulado,Risco_maximo,Aumento_distancia_pct,Reducao_risco_pct,Tem_coord_suspeita
+Mais curta,J001,14.4801,2830.0,190.0,0.0,0.0,False
+Recomendada (joelho),J140,15.7452,620.0,90.0,8.736818115896993,78.09187279151944,False
+Menor risco,J459,30.509399999999967,0.0,0.0,110.69882114073775,100.0,True
