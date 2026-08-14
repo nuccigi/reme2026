@@ -485,23 +485,6 @@ with tab2:
     )
 
     # --------------------------------------------------------
-    # Resumo da solução final J140
-    # --------------------------------------------------------
-
-    st.subheader("Resumo da rota recomendada")
-
-    resumo_j140 = pd.DataFrame({
-        "Rota": [rec["Jornada_Pareto_ID"]],
-        "Distância total (km)": [round(float(rec["Distancia_km"]), 3)],
-        "Risco acumulado": [int(rec["Risco_acumulado"])],
-        "Risco máximo": [int(rec["Risco_maximo"])],
-        "Aumento da distância": [f'{float(rec["Aumento_distancia_pct"]):.2f}%'],
-        "Redução do risco": [f'{float(rec["Reducao_risco_pct"]):.2f}%']
-    })
-
-    show_html_table(resumo_j140)
-
-    # --------------------------------------------------------
     # Decomposição por trecho
     # --------------------------------------------------------
 
