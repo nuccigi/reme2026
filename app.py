@@ -173,6 +173,7 @@ fig.add_trace(
 
 fig.update_layout(
     height=750,
+    showlegend=False,
     map=dict(
         style="open-street-map",
         center=dict(
@@ -186,13 +187,14 @@ fig.update_layout(
         r=0,
         t=20,
         b=0
-    ),
-    legend_title="Mobilizações"
+    )
 )
-
 st.plotly_chart(
     fig,
-    use_container_width=True
+    use_container_width=True,
+    config={
+        "displayModeBar": False
+    }
 )
 
 # ============================================================
