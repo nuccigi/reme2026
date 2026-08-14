@@ -46,41 +46,39 @@ st.markdown(
         color: #111827;
     }
 
-/* MENU DESAFIO 1 / DESAFIO 2 */
+/* SELETOR DE DESAFIO */
 
-    div[data-testid="stSegmentedControl"] {
-        width: 100% !important;
+    div[data-testid="stSelectbox"] {
+        max-width: 420px;
+        margin-bottom: 1rem;
     }
 
-    div[data-testid="stSegmentedControl"] > div {
-        width: 100% !important;
-    }
-
-    div[data-testid="stSegmentedControl"] button {
-        flex: 1 1 50% !important;
-        min-height: 58px !important;
-        font-size: 1.2rem !important;
+    div[data-testid="stSelectbox"] label p {
+        font-size: 1.05rem !important;
         font-weight: 700 !important;
-        padding: 12px 20px !important;
+        color: #111827 !important;
     }
 
-    div[data-testid="stSegmentedControl"] button p {
-        font-size: 1.2rem !important;
-        font-weight: 700 !important;
+    div[data-baseweb="select"] > div {
+        min-height: 52px !important;
+        font-size: 1.05rem !important;
+        border-radius: 10px !important;
     }
 
     @media screen and (max-width: 768px) {
-        div[data-testid="stSegmentedControl"] button {
-            flex: 1 1 50% !important;
-            min-height: 64px !important;
-            font-size: 1.25rem !important;
-            font-weight: 800 !important;
-            padding: 12px 10px !important;
+        div[data-testid="stSelectbox"] {
+            max-width: 100% !important;
+            width: 100% !important;
         }
 
-        div[data-testid="stSegmentedControl"] button p {
-            font-size: 1.25rem !important;
+        div[data-testid="stSelectbox"] label p {
+            font-size: 1.05rem !important;
             font-weight: 800 !important;
+        }
+
+        div[data-baseweb="select"] > div {
+            min-height: 56px !important;
+            font-size: 1.05rem !important;
         }
     }
 
@@ -163,13 +161,10 @@ def show_html_table(df):
 # MENU SUPERIOR
 # ============================================================
 
-pagina = st.segmented_control(
-    "Selecione o desafio",
+pagina = st.selectbox(
+    "Escolha o desafio 1 ou 2",
     options=["Desafio 1", "Desafio 2"],
-    default="Desafio 1",
-    selection_mode="single",
-    label_visibility="collapsed",
-    width="stretch"
+    index=0
 )
 
 
