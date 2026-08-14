@@ -46,28 +46,48 @@ st.markdown(
         color: #111827;
     }
 
-/* Tabs - computador */
-button[data-baseweb="tab"] {
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    padding: 14px 35px !important;
-    min-width: 170px !important;
+/* =========================================
+   ABAS DESAFIO 1 / DESAFIO 2
+   ========================================= */
+
+/* Cada aba ocupa metade da largura */
+div[data-baseweb="tab-list"] {
+    gap: 8px !important;
+    width: 100% !important;
 }
 
-button[data-baseweb="tab"] p {
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
+/* Botão inteiro */
+div[data-baseweb="tab-list"] button {
+    flex: 1 1 50% !important;
+    min-height: 60px !important;
+    padding: 14px 20px !important;
 }
 
-/* Tabs - celular */
-@media (max-width: 768px) {
-    button[data-baseweb="tab"] {
-        padding: 14px 20px !important;
-        min-width: 140px !important;
+/* Texto da aba */
+div[data-baseweb="tab-list"] button div[data-testid="stMarkdownContainer"] p {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+/* CELULAR */
+@media screen and (max-width: 768px) {
+
+    div[data-baseweb="tab-list"] {
+        width: 100% !important;
+        gap: 4px !important;
     }
 
-    button[data-baseweb="tab"] p {
-        font-size: 1.2rem !important;
+    div[data-baseweb="tab-list"] button {
+        flex: 1 1 50% !important;
+        min-width: 0 !important;
+        min-height: 64px !important;
+        padding: 12px 8px !important;
+    }
+
+    div[data-baseweb="tab-list"] button div[data-testid="stMarkdownContainer"] p {
+        font-size: 21px !important;
+        font-weight: 800 !important;
     }
 }
 
