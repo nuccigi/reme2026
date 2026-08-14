@@ -1,0 +1,4 @@
+﻿Trecho,Pareto_ID,Distancia_km,Risco_acumulado,Risco_maximo,Numero_nos,Tem_coord_suspeita
+Casa -> UFU,P004,4.399400000000001,278.0,90.0,46,False
+UFU -> Hospital,P023,3.9123000000000014,34.0,8.0,49,False
+Hospital -> Casa,P021,7.433499999999999,308.0,90.0,99,False
