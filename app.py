@@ -46,7 +46,7 @@ st.markdown(
         color: #111827;
     }
 
-  /* Tabs superiores - Desafio 1 e Desafio 2 */
+/* Tabs - computador */
 button[data-baseweb="tab"] {
     font-size: 1.25rem !important;
     font-weight: 700 !important;
@@ -54,10 +54,21 @@ button[data-baseweb="tab"] {
     min-width: 170px !important;
 }
 
-/* Aumenta também o texto dentro da aba */
 button[data-baseweb="tab"] p {
     font-size: 1.25rem !important;
     font-weight: 700 !important;
+}
+
+/* Tabs - celular */
+@media (max-width: 768px) {
+    button[data-baseweb="tab"] {
+        padding: 14px 20px !important;
+        min-width: 140px !important;
+    }
+
+    button[data-baseweb="tab"] p {
+        font-size: 1.2rem !important;
+    }
 }
 
     /* Tabela HTML sem toolbar */
