@@ -46,11 +46,19 @@ st.markdown(
         color: #111827;
     }
 
-    /* Tabs superiores */
-    button[data-baseweb="tab"] {
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-    }
+  /* Tabs superiores - Desafio 1 e Desafio 2 */
+button[data-baseweb="tab"] {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    padding: 14px 35px !important;
+    min-width: 170px !important;
+}
+
+/* Aumenta também o texto dentro da aba */
+button[data-baseweb="tab"] p {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+}
 
     /* Tabela HTML sem toolbar */
     .table-wrap {
