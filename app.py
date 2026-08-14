@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
-import os
 
 # ============================================================
 # CONFIGURAÇÃO
@@ -15,169 +14,173 @@ st.set_page_config(
 )
 
 # ============================================================
-# CSS
+# VISUAL — FORÇAR TEMA CLARO E DEIXAR APP LIMPO
 # ============================================================
 
 st.markdown(
     """
     <style>
+    :root {
+        color-scheme: light !important;
+    }
+
+    html, body,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    .stApp {
+        background: #ffffff !important;
+        color: #111827 !important;
+    }
+
+    [data-testid="stHeader"] {
+        background: rgba(255,255,255,0) !important;
+    }
 
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
         max-width: 1400px;
+        padding-top: 1.8rem;
+        padding-bottom: 3rem;
     }
 
-    h1 {
-        font-weight: 700;
+    h1, h2, h3, p, label, span {
+        color: #111827;
     }
 
-    /* Tabela limpa e responsiva */
-    .tabela-container {
+    /* Tabs superiores */
+    button[data-baseweb="tab"] {
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+    }
+
+    /* Tabela HTML sem toolbar */
+    .table-wrap {
         width: 100%;
         overflow-x: auto;
-        margin-top: 1rem;
+        margin-top: 0.8rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
     }
 
-    .tabela-custom {
+    table.clean-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 15px;
+        background: #ffffff;
+        font-size: 14px;
     }
 
-    .tabela-custom th {
-        background-color: #f3f4f6;
+    table.clean-table th {
+        background: #f3f4f6;
         color: #111827;
-        text-align: left;
         padding: 12px 14px;
+        text-align: left;
         border-bottom: 1px solid #d1d5db;
         white-space: nowrap;
     }
 
-    .tabela-custom td {
+    table.clean-table td {
+        color: #111827;
         padding: 12px 14px;
         border-bottom: 1px solid #e5e7eb;
-        color: #111827;
         white-space: nowrap;
     }
 
-    @media (max-width: 768px) {
+    table.clean-table tr:last-child td {
+        border-bottom: none;
+    }
 
+    @media (max-width: 768px) {
         .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding-left: 0.8rem;
+            padding-right: 0.8rem;
+            padding-top: 1rem;
         }
 
         h1 {
-            font-size: 1.8rem !important;
+            font-size: 1.7rem !important;
         }
 
-        .tabela-custom {
-            font-size: 13px;
+        table.clean-table {
+            font-size: 12px;
         }
 
-        .tabela-custom th,
-        .tabela-custom td {
-            padding: 9px;
+        table.clean-table th,
+        table.clean-table td {
+            padding: 8px 9px;
         }
     }
-
     </style>
     """,
     unsafe_allow_html=True
 )
 
+
+def show_html_table(df):
+    html = df.to_html(
+        index=False,
+        classes="clean-table",
+        border=0,
+        escape=False
+    )
+    st.markdown(
+        f'<div class="table-wrap">{html}</div>',
+        unsafe_allow_html=True
+    )
+
+
 # ============================================================
 # MENU SUPERIOR
 # ============================================================
 
-pagina = st.radio(
-    "",
-    ["Desafio 1", "Desafio 2"],
-    horizontal=True,
-    label_visibility="collapsed"
-)
-
-# ============================================================
-# FUNÇÃO PARA EXIBIR TABELA SEM TOOLBAR
-# ============================================================
-
-def mostrar_tabela(df):
-
-    html = df.to_html(
-        index=False,
-        classes="tabela-custom",
-        border=0,
-        escape=False
-    )
-
-    st.markdown(
-        f"""
-        <div class="tabela-container">
-            {html}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+tab1, tab2 = st.tabs(["Desafio 1", "Desafio 2"])
 
 
 # ============================================================
 # DESAFIO 1
 # ============================================================
 
-if pagina == "Desafio 1":
+with tab1:
 
     st.title("Desafio 1 — Pontos de Mobilização")
 
     # --------------------------------------------------------
-    # DADOS
+    # Arquivos
     # --------------------------------------------------------
 
-    dados = pd.read_csv(
-        "instancia_localizacao_OFICINA.csv"
-    )
+    dados = pd.read_csv("instancia_localizacao_OFICINA.csv")
+    atribuicoes = pd.read_csv("atribuicoes.csv")
 
-    atribuicoes = pd.read_csv(
-        "atribuicoes.csv"
-    )
-
-    nos = dados[
-        [
-            "ID_Origem",
-            "Logradouro",
-            "Bairro",
-            "Latitude",
-            "Longitude",
-            "Frequencia_Acidentes"
+    nos = (
+        dados[
+            [
+                "ID_Origem",
+                "Logradouro",
+                "Bairro",
+                "Latitude",
+                "Longitude",
+                "Frequencia_Acidentes"
+            ]
         ]
-    ].drop_duplicates(
-        subset="ID_Origem"
+        .drop_duplicates(subset="ID_Origem")
+        .copy()
     )
 
     nos_acidentes = nos[
         nos["Frequencia_Acidentes"] > 0
     ].copy()
 
-    pontos_finais = [
-        86,
-        98,
-        210,
-        227,
-        440
-    ]
+    pontos_finais = [86, 98, 210, 227, 440]
 
-    # ========================================================
-    # MAPA
-    # ========================================================
+    # --------------------------------------------------------
+    # Mapa interativo
+    # --------------------------------------------------------
 
-    fig = go.Figure()
+    fig1 = go.Figure()
 
     for mobilizacao in pontos_finais:
 
         pontos_mob = atribuicoes[
-            atribuicoes["mobilizacao"]
-            == mobilizacao
-        ]
+            atribuicoes["mobilizacao"] == mobilizacao
+        ].copy()
 
         info = nos_acidentes[
             nos_acidentes["ID_Origem"].isin(
@@ -187,130 +190,88 @@ if pagina == "Desafio 1":
 
         info = info.merge(
             pontos_mob[
-                [
-                    "ponto_acidente",
-                    "distancia_metros"
-                ]
+                ["ponto_acidente", "distancia_metros"]
             ],
             left_on="ID_Origem",
             right_on="ponto_acidente",
             how="left"
         )
 
-        hover = []
-
-        for _, linha in info.iterrows():
-
-            hover.append(
-                f"""
-                <b>Ponto {int(linha['ID_Origem'])}</b><br>
-                {linha['Logradouro']}<br>
-                {linha['Bairro']}<br>
-                Acidentes: {int(linha['Frequencia_Acidentes'])}<br>
-                Mobilização: {mobilizacao}<br>
-                Distância: {linha['distancia_metros']/1000:.2f} km
-                """
+        hover = [
+            (
+                f"<b>Ponto {int(row.ID_Origem)}</b><br>"
+                f"{row.Logradouro}<br>"
+                f"{row.Bairro}<br>"
+                f"Acidentes: {int(row.Frequencia_Acidentes)}<br>"
+                f"Mobilização: {mobilizacao}<br>"
+                f"Distância: {row.distancia_metros/1000:.2f} km"
             )
+            for _, row in info.iterrows()
+        ]
 
-        fig.add_trace(
+        fig1.add_trace(
             go.Scattermap(
                 lat=info["Latitude"],
                 lon=info["Longitude"],
                 mode="markers",
                 marker=dict(
-                    size=(
-                        info["Frequencia_Acidentes"]
-                        * 2 + 5
-                    ),
+                    size=info["Frequencia_Acidentes"] * 2 + 5,
                     opacity=0.65
                 ),
                 text=hover,
                 hoverinfo="text",
-                name=f"Mobilização {mobilizacao}"
+                showlegend=False
             )
         )
 
-    # --------------------------------------------------------
-    # CENTROS
-    # --------------------------------------------------------
-
     centros = nos_acidentes[
-        nos_acidentes["ID_Origem"].isin(
-            pontos_finais
-        )
+        nos_acidentes["ID_Origem"].isin(pontos_finais)
     ].copy()
 
-    hover_centros = []
-
-    for _, linha in centros.iterrows():
-
-        hover_centros.append(
-            f"""
-            <b>Mobilização {int(linha['ID_Origem'])}</b><br>
-            {linha['Logradouro']}<br>
-            {linha['Bairro']}
-            """
+    hover_centros = [
+        (
+            f"<b>Mobilização {int(row.ID_Origem)}</b><br>"
+            f"{row.Logradouro}<br>"
+            f"{row.Bairro}"
         )
+        for _, row in centros.iterrows()
+    ]
 
-    fig.add_trace(
+    fig1.add_trace(
         go.Scattermap(
             lat=centros["Latitude"],
             lon=centros["Longitude"],
             mode="markers+text",
-
             marker=dict(
                 size=22,
                 symbol="star"
             ),
-
-            text=(
-                centros["ID_Origem"]
-                .astype(int)
-                .astype(str)
-            ),
-
+            text=centros["ID_Origem"].astype(int).astype(str),
             textposition="top center",
-
             hovertext=hover_centros,
             hoverinfo="text",
-
-            name="Mobilizações"
+            showlegend=False
         )
     )
 
-    fig.update_layout(
-
+    fig1.update_layout(
         height=720,
-
         showlegend=False,
-
         map=dict(
-
             style="open-street-map",
-
             center=dict(
-                lat=nos_acidentes[
-                    "Latitude"
-                ].mean(),
-
-                lon=nos_acidentes[
-                    "Longitude"
-                ].mean()
+                lat=nos_acidentes["Latitude"].mean(),
+                lon=nos_acidentes["Longitude"].mean()
             ),
-
             zoom=11
         ),
-
-        margin=dict(
-            l=0,
-            r=0,
-            t=10,
-            b=0
-        )
+        margin=dict(l=0, r=0, t=5, b=0),
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff"
     )
 
     st.plotly_chart(
-        fig,
+        fig1,
         use_container_width=True,
         config={
             "displayModeBar": False,
@@ -318,48 +279,26 @@ if pagina == "Desafio 1":
         }
     )
 
-    # ========================================================
-    # RESUMO
-    # ========================================================
+    # --------------------------------------------------------
+    # Resumo
+    # --------------------------------------------------------
 
-    st.subheader(
-        "Resumo das mobilizações"
-    )
+    st.subheader("Resumo das mobilizações")
 
     resumo = (
         atribuicoes
         .groupby("mobilizacao")
         .agg(
-
-            pontos_atendidos=(
-                "ponto_acidente",
-                "count"
-            ),
-
-            acidentes_atendidos=(
-                "frequencia_acidentes",
-                "sum"
-            ),
-
-            distancia_total_metros=(
-                "distancia_metros",
-                "sum"
-            )
+            pontos_atendidos=("ponto_acidente", "count"),
+            acidentes_atendidos=("frequencia_acidentes", "sum"),
+            distancia_total_metros=("distancia_metros", "sum")
         )
         .reset_index()
     )
 
     info_centros = centros[
-        [
-            "ID_Origem",
-            "Logradouro",
-            "Bairro"
-        ]
-    ].rename(
-        columns={
-            "ID_Origem": "mobilizacao"
-        }
-    )
+        ["ID_Origem", "Logradouro", "Bairro"]
+    ].rename(columns={"ID_Origem": "mobilizacao"})
 
     resumo = resumo.merge(
         info_centros,
@@ -368,13 +307,11 @@ if pagina == "Desafio 1":
     )
 
     resumo["Distância total (km)"] = (
-        resumo["distancia_total_metros"]
-        / 1000
+        resumo["distancia_total_metros"] / 1000
     ).round(2)
 
     resumo["acidentes_atendidos"] = (
-        resumo["acidentes_atendidos"]
-        .astype(int)
+        resumo["acidentes_atendidos"].astype(int)
     )
 
     resumo = resumo[
@@ -397,184 +334,224 @@ if pagina == "Desafio 1":
         "Distância total (km)"
     ]
 
-    mostrar_tabela(resumo)
+    show_html_table(resumo)
 
 
 # ============================================================
 # DESAFIO 2
 # ============================================================
 
-else:
+with tab2:
 
-    st.title(
-        "Desafio 2 — Jornada Recomendada"
+    st.title("Desafio 2 — Rota Recomendada")
+
+    # --------------------------------------------------------
+    # Arquivos finais da versão do ZIP
+    # --------------------------------------------------------
+
+    malha2 = pd.read_csv(
+        "instancia_rotas_OFICINA_versao2.csv"
     )
 
-    # ========================================================
-    # MAPA DA ROTA
-    # ========================================================
-
-    if os.path.exists(
-        "rotas_desafio2.csv"
-    ):
-
-        rotas = pd.read_csv(
-            "rotas_desafio2.csv"
-        )
-
-        fig2 = go.Figure()
-
-        for trecho in rotas[
-            "trecho"
-        ].unique():
-
-            rota = (
-                rotas[
-                    rotas["trecho"]
-                    == trecho
-                ]
-                .sort_values("ordem")
-            )
-
-            fig2.add_trace(
-
-                go.Scattermap(
-
-                    lat=rota[
-                        "latitude"
-                    ],
-
-                    lon=rota[
-                        "longitude"
-                    ],
-
-                    mode="lines+markers",
-
-                    line=dict(
-                        width=5
-                    ),
-
-                    marker=dict(
-                        size=6
-                    ),
-
-                    name=str(trecho),
-
-                    text=[
-                        f"{trecho}"
-                        for _ in range(
-                            len(rota)
-                        )
-                    ],
-
-                    hoverinfo="text"
-                )
-            )
-
-        fig2.update_layout(
-
-            height=720,
-
-            showlegend=False,
-
-            map=dict(
-
-                style="open-street-map",
-
-                center=dict(
-                    lat=rotas[
-                        "latitude"
-                    ].mean(),
-
-                    lon=rotas[
-                        "longitude"
-                    ].mean()
-                ),
-
-                zoom=11
-            ),
-
-            margin=dict(
-                l=0,
-                r=0,
-                t=10,
-                b=0
-            )
-        )
-
-        st.plotly_chart(
-            fig2,
-            use_container_width=True,
-            config={
-                "displayModeBar": False,
-                "scrollZoom": True
-            }
-        )
-
-    else:
-
-        st.info(
-            "O mapa será exibido aqui quando "
-            "o arquivo rotas_desafio2.csv "
-            "for adicionado ao projeto."
-        )
-
-    # ========================================================
-    # TABELA DESAFIO 2
-    # ========================================================
-
-    st.subheader(
-        "Decomposição da Jornada Recomendada por Trecho"
+    caminho = pd.read_csv(
+        "caminho_recomendado.csv"
     )
 
-    tabela_desafio2 = pd.DataFrame({
+    decomposicao = pd.read_csv(
+        "decomposicao_recomendada.csv"
+    )
 
-        "Trecho": [
-            "Perna 1",
-            "Perna 2",
-            "Perna 3",
-            "Jornada Total"
-        ],
+    selecao = pd.read_csv(
+        "selecao_principal.csv"
+    )
 
-        "Caminho / Origem → Destino": [
-
-            "Casa (924) → UFU (1810)",
-
-            "UFU (1810) → Hospital (1350)",
-
-            "Hospital (1350) → Casa (924)",
-
-            "Casa → UFU → Hosp → Casa"
-        ],
-
-        "Distância": [
-            "5,770 km",
-            "9,879 km",
-            "8,547 km",
-            "24,196 km"
-        ],
-
-        "Risco Acum.": [
-            "340,0",
-            "105,0",
-            "193,0",
-            "638,0"
-        ],
-
-        "Risco Máx.": [
-            "150,0",
-            "15,0",
-            "155,0",
-            "155,0"
-        ],
-
-        "ID Pareto": [
-            "T1_P004",
-            "T2_P023",
-            "T3_P021",
-            "J004"
+    # Uma linha por nó com coordenadas
+    coords2 = (
+        malha2[
+            ["ID_Origem", "Logradouro", "Latitude", "Longitude", "Indice_Periculosidade"]
         ]
+        .drop_duplicates(subset="ID_Origem")
+        .copy()
+    )
+
+    # --------------------------------------------------------
+    # Coordenadas da rota J140 na ordem correta
+    # --------------------------------------------------------
+
+    rota = caminho.merge(
+        coords2,
+        left_on="No",
+        right_on="ID_Origem",
+        how="left"
+    ).sort_values("Ordem")
+
+    # --------------------------------------------------------
+    # Informações da solução recomendada
+    # --------------------------------------------------------
+
+    rec = selecao[
+        selecao["Solucao"] == "Recomendada (joelho)"
+    ].iloc[0]
+
+    # --------------------------------------------------------
+    # Mapa interativo da rota recomendada
+    # --------------------------------------------------------
+
+    fig2 = go.Figure()
+
+    # Rota completa
+    fig2.add_trace(
+        go.Scattermap(
+            lat=rota["Latitude"],
+            lon=rota["Longitude"],
+            mode="lines",
+            line=dict(width=5),
+            text=[
+                (
+                    f"Nó: {int(row.No)}<br>"
+                    f"{row.Logradouro}<br>"
+                    f"Risco do nó: {row.Indice_Periculosidade:g}"
+                )
+                for _, row in rota.iterrows()
+            ],
+            hoverinfo="text",
+            showlegend=False
+        )
+    )
+
+    # Pontos-chave: Casa, UFU e Hospital
+    pontos_chave = pd.DataFrame({
+        "No": [924, 1810, 1350],
+        "Nome": ["Casa", "UFU", "Hospital"]
+    }).merge(
+        coords2,
+        left_on="No",
+        right_on="ID_Origem",
+        how="left"
+    )
+
+    fig2.add_trace(
+        go.Scattermap(
+            lat=pontos_chave["Latitude"],
+            lon=pontos_chave["Longitude"],
+            mode="markers+text",
+            marker=dict(
+                size=20,
+                symbol="star"
+            ),
+            text=[
+                f"{nome} ({no})"
+                for nome, no in zip(
+                    pontos_chave["Nome"],
+                    pontos_chave["No"]
+                )
+            ],
+            textposition="top center",
+            hovertext=[
+                (
+                    f"<b>{row.Nome} ({int(row.No)})</b><br>"
+                    f"{row.Logradouro}"
+                )
+                for _, row in pontos_chave.iterrows()
+            ],
+            hoverinfo="text",
+            showlegend=False
+        )
+    )
+
+    fig2.update_layout(
+        height=720,
+        showlegend=False,
+        map=dict(
+            style="open-street-map",
+            center=dict(
+                lat=rota["Latitude"].mean(),
+                lon=rota["Longitude"].mean()
+            ),
+            zoom=12
+        ),
+        margin=dict(l=0, r=0, t=5, b=0),
+        paper_bgcolor="#ffffff",
+        plot_bgcolor="#ffffff"
+    )
+
+    st.plotly_chart(
+        fig2,
+        use_container_width=True,
+        config={
+            "displayModeBar": False,
+            "scrollZoom": True
+        }
+    )
+
+    # --------------------------------------------------------
+    # Resumo da solução final J140
+    # --------------------------------------------------------
+
+    st.subheader("Resumo da rota recomendada")
+
+    resumo_j140 = pd.DataFrame({
+        "Rota": [rec["Jornada_Pareto_ID"]],
+        "Distância total (km)": [round(float(rec["Distancia_km"]), 3)],
+        "Risco acumulado": [int(rec["Risco_acumulado"])],
+        "Risco máximo": [int(rec["Risco_maximo"])],
+        "Aumento da distância": [f'{float(rec["Aumento_distancia_pct"]):.2f}%'],
+        "Redução do risco": [f'{float(rec["Reducao_risco_pct"]):.2f}%']
     })
+
+    show_html_table(resumo_j140)
+
+    # --------------------------------------------------------
+    # Decomposição por trecho
+    # --------------------------------------------------------
+
+    st.subheader("Decomposição da jornada por trecho")
+
+    tabela_trechos = decomposicao[
+        [
+            "Trecho",
+            "Pareto_ID",
+            "Distancia_km",
+            "Risco_acumulado",
+            "Risco_maximo"
+        ]
+    ].copy()
+
+    tabela_trechos["Distancia_km"] = (
+        tabela_trechos["Distancia_km"].round(3)
+    )
+
+    tabela_trechos["Risco_acumulado"] = (
+        tabela_trechos["Risco_acumulado"].astype(int)
+    )
+
+    tabela_trechos["Risco_maximo"] = (
+        tabela_trechos["Risco_maximo"].astype(int)
+    )
+
+    tabela_trechos.columns = [
+        "Trecho",
+        "ID Pareto",
+        "Distância (km)",
+        "Risco acumulado",
+        "Risco máximo"
+    ]
+
+    # Linha total
+    total = pd.DataFrame({
+        "Trecho": ["Jornada Total"],
+        "ID Pareto": [rec["Jornada_Pareto_ID"]],
+        "Distância (km)": [round(float(rec["Distancia_km"]), 3)],
+        "Risco acumulado": [int(rec["Risco_acumulado"])],
+        "Risco máximo": [int(rec["Risco_maximo"])]
+    })
+
+    tabela_trechos = pd.concat(
+        [tabela_trechos, total],
+        ignore_index=True
+    )
+
+    show_html_table(tabela_trechos)
 
     mostrar_tabela(
         tabela_desafio2
