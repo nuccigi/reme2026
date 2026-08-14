@@ -535,7 +535,3 @@ with tab2:
     )
 
     show_html_table(tabela_trechos)
-
-    mostrar_tabela(
-        tabela_desafio2
-    )
