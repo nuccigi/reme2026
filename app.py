@@ -46,50 +46,43 @@ st.markdown(
         color: #111827;
     }
 
-/* =========================================
-   ABAS DESAFIO 1 / DESAFIO 2
-   ========================================= */
+/* MENU DESAFIO 1 / DESAFIO 2 */
 
-/* Cada aba ocupa metade da largura */
-div[data-baseweb="tab-list"] {
-    gap: 8px !important;
-    width: 100% !important;
-}
-
-/* Botão inteiro */
-div[data-baseweb="tab-list"] button {
-    flex: 1 1 50% !important;
-    min-height: 60px !important;
-    padding: 14px 20px !important;
-}
-
-/* Texto da aba */
-div[data-baseweb="tab-list"] button div[data-testid="stMarkdownContainer"] p {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-}
-
-/* CELULAR */
-@media screen and (max-width: 768px) {
-
-    div[data-baseweb="tab-list"] {
+    div[data-testid="stSegmentedControl"] {
         width: 100% !important;
-        gap: 4px !important;
     }
 
-    div[data-baseweb="tab-list"] button {
+    div[data-testid="stSegmentedControl"] > div {
+        width: 100% !important;
+    }
+
+    div[data-testid="stSegmentedControl"] button {
         flex: 1 1 50% !important;
-        min-width: 0 !important;
-        min-height: 64px !important;
-        padding: 12px 8px !important;
+        min-height: 58px !important;
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
+        padding: 12px 20px !important;
     }
 
-    div[data-baseweb="tab-list"] button div[data-testid="stMarkdownContainer"] p {
-        font-size: 21px !important;
-        font-weight: 800 !important;
+    div[data-testid="stSegmentedControl"] button p {
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
     }
-}
+
+    @media screen and (max-width: 768px) {
+        div[data-testid="stSegmentedControl"] button {
+            flex: 1 1 50% !important;
+            min-height: 64px !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            padding: 12px 10px !important;
+        }
+
+        div[data-testid="stSegmentedControl"] button p {
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+        }
+    }
 
     /* Tabela HTML sem toolbar */
     .table-wrap {
@@ -170,14 +163,21 @@ def show_html_table(df):
 # MENU SUPERIOR
 # ============================================================
 
-tab1, tab2 = st.tabs(["Desafio 1", "Desafio 2"])
+pagina = st.segmented_control(
+    "Selecione o desafio",
+    options=["Desafio 1", "Desafio 2"],
+    default="Desafio 1",
+    selection_mode="single",
+    label_visibility="collapsed",
+    width="stretch"
+)
 
 
 # ============================================================
 # DESAFIO 1
 # ============================================================
 
-with tab1:
+if pagina == "Desafio 1":
 
     st.title("Desafio 1 — Pontos de Mobilização")
 
@@ -380,7 +380,7 @@ with tab1:
 # DESAFIO 2
 # ============================================================
 
-with tab2:
+elif pagina == "Desafio 2":
 
     st.title("Desafio 2 — Rota Recomendada")
 
